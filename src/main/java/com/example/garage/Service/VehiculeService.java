@@ -1,9 +1,11 @@
 package com.example.garage.Service;
 
+import com.example.garage.Kafka.VehicleEventPublisher;
 import com.example.garage.Repository.GarageRepository;
 import com.example.garage.Repository.VehiculeRepository;
 import com.example.garage.model.Garage;
 import com.example.garage.model.Vehicle;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,10 @@ public class VehiculeService {
 
         @Autowired
         private VehiculeRepository vehicleRepository;
+        @Autowired
+        private  VehicleEventPublisher vehicleEventPublisher;
+        @Autowired
+        private  ObjectMapper objectMapper;
 
         @Autowired
         private GarageRepository garageRepository;
@@ -32,7 +38,16 @@ public class VehiculeService {
                 }
                 vehicle.setGarage(garage);
                 garage.getVehicles().add(vehicle);
-                return vehicleRepository.save(vehicle);
+                Vehicle savedVehicle = vehicleRepository.save(vehicle);
+                try {
+                    // Convert saved vehicle to JSON.
+                    String vehicleJson = objectMapper.writeValueAsString(savedVehicle);
+                    // Publish the JSON event to Kafka.
+                    vehicleEventPublisher.publishVehicleEvent(vehicleJson);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return savedVehicle;
             }
             throw new RuntimeException("Garage not found.");
         }
@@ -68,7 +83,9 @@ public class VehiculeService {
             return vehicleRepository.findByGarageId(garageId);
         }
 
-
+        public List<Vehicle> getVehiclesByBrand(String brand) {
+            return vehicleRepository.findByBrand(brand);
+        }
 
 
         public List<Vehicle> getAllVehicles() {

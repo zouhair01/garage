@@ -6,6 +6,7 @@ import com.example.garage.model.Accessory;
 import com.example.garage.model.Garage;
 import com.example.garage.model.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class GarageController {
         return garageService.getGarageById(id);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Garage> getAllGarages() {
         return garageService.getAllGarages();
     }
@@ -39,5 +40,20 @@ public class GarageController {
     @PostMapping("/vehicles/{vehicleId}/accessories")
     public Accessory addAccessoryToVehicle(@PathVariable Long vehicleId, @RequestBody Accessory accessory) {
         return garageService.addAccessoryToVehicle(vehicleId, accessory);
+    }
+
+    @GetMapping("/sorted")
+    public Page<Garage> getAllGaragesSorted(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        return garageService.getAllGaragesSorted(page, size, sortBy, direction);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteGarage(@PathVariable Long id) {
+        garageService.deleteGarage(id);
     }
 }

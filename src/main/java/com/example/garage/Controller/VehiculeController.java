@@ -42,6 +42,10 @@ public class VehiculeController {
         public void deleteVehicle(@PathVariable Long id) {
             vehicleService.deleteVehicle(id);
         }
+    @GetMapping("/vehicles-by-brand")
+    public List<Vehicle> getVehiclesByBrand(@RequestParam String brand) {
+        return vehicleService.getVehiclesByBrand(brand);
+    }
 }
 
 

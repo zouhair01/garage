@@ -19,6 +19,21 @@ public class AccessoryService {
     private VehiculeRepository vehicleRepository;
 
 
+    public Accessory createAccessory(Accessory accessory) {
+        return accessoryRepository.save(accessory);
+    }
+
+
+    public List<Accessory> getAllAccessories() {
+        return accessoryRepository.findAll();
+    }
+
+
+    public Accessory getAccessoryById(Long id) {
+        return accessoryRepository.findById(id).orElse(null);
+    }
+
+
     public Accessory addAccessoryToVehicle(Long vehicleId, Accessory accessory) {
         Optional<Vehicle> vehicleOptional = vehicleRepository.findById(vehicleId);
         if (vehicleOptional.isPresent()) {
@@ -49,6 +64,10 @@ public class AccessoryService {
     }
 
     public List<Accessory> getAccessoriesByVehicle(Long vehicleId) {
+        return accessoryRepository.findByVehicleId(vehicleId);
+    }
+
+    public List<Accessory> getAccessoriesByVehicleId(Long vehicleId) {
         return accessoryRepository.findByVehicleId(vehicleId);
     }
 
